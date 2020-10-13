@@ -1,6 +1,22 @@
 # hello_psg.py
 
 import PySimpleGUI as sg
+from PIL import Image, ImageTk
+import io
+
+
+def get_img_data(f, maxsize=(200, 200), first=False):
+    """Generate image data using PIL
+    """
+    img = Image.open(f)
+    img.thumbnail(maxsize)
+    if first:                     # tkinter is inactive the first time
+        bio = io.BytesIO()
+        img.save(bio, format="PNG")
+        del img
+        return bio.getvalue()
+    return ImageTk.PhotoImage(img)
+
 
 sg.theme('Dark Purple 7')
 
@@ -21,7 +37,7 @@ message_column = [
     [sg.In(size=(30, 1), enable_events=True, font='Verdana 13', key="-FILE_NAME-"), sg.FileBrowse('Upload Image',
                                                                                                   font='Calibri 16', key='_BUTTON_UPLOAD_')],
     [sg.Text(size=(60, 1), key="-UPLOAD_INFO-")],
-    [sg.Image(key="-IMAGE-", size=(40, 40))],
+    [sg.Image(key="-IMAGE-")],
     [sg.Text(size=(60, 1), key="-SPACE4-")],
     [sg.Button('Send', border_width=0, font='Calibri 16', key='_BUTTON_SEND_'), sg.Button(
         'Send to all', border_width=0, font='Calibri 16', key='_BUTTON_SEND_TO_ALL_')],
@@ -52,9 +68,9 @@ while True:
         msg = values["-MESSAGE-"]
     if event == "-FILE_NAME-":
         filename = values["-FILE_NAME-"]
-        if filename.endswith(('.png', '.gif')):
+        if filename.endswith(('.png', '.gif', '.jpg', 'jpeg')):
             window['-UPLOAD_INFO-'].update("")
-            window["-IMAGE-"].update(filename=filename)
+            window["-IMAGE-"].update(data=get_img_data(filename, first=True))
         else:
             window['-UPLOAD_INFO-'].update("Please select valid image")
     if event == "OK" or event == sg.WIN_CLOSED:
