@@ -2,23 +2,29 @@
 
 import PySimpleGUI as sg
 
-sg.theme('Dark Grey 8')
+sg.theme('Dark Purple 7')
+
+clients = ['Gone last', "Yoboii", "Sharma ji", "Bandu", "Mote dai"]
 clients_column = [
-    [sg.Text("Clients", font='Courier 20')],
+    [sg.Text("Server", font='Courier 40')],
     [sg.Text(size=(40, 1), key="-SPACE1-")],
-    [sg.Text("Client 1", size=(40, 1), font='Calibri 14')],
-    [sg.Text("Client 2", size=(40, 1), font='Calibri 14')],
-    [sg.Text("Client 3", size=(40, 1), font='Calibri 14')],
-    [sg.Text("Client 4", size=(40, 1), font='Calibri 14')],
 ]
+for client in clients:
+    clients_column.append([sg.Text(f'{client}', font='Verdana 14')])
+
 message_column = [
     [sg.Text("Message", font='Courier 20')],
     [sg.Text(size=(60, 1), key="-SPACE2-")],
-    [sg.Multiline(size=(60, 7), font='Calibri 13',
+    [sg.Multiline(size=(60, 7), font='Times 13', border_width=0, background_color='#dedede', text_color='#131',
                   enable_events=True, key="-MESSAGE-")],
     [sg.Text(size=(60, 1), key="-SPACE3-")],
-    [sg.Button('Send', font='Calibri 16', key='_BUTTON_SEND_'), sg.Button(
-        'Send to all', font='Calibri 16', key='_BUTTON_SEND_TO_ALL_')],
+    [sg.In(size=(30, 1), enable_events=True, font='Verdana 13', key="-FILE_NAME-"), sg.FileBrowse('Upload Image',
+                                                                                                  font='Calibri 16', key='_BUTTON_UPLOAD_')],
+    [sg.Text(size=(60, 1), key="-UPLOAD_INFO-")],
+    [sg.Image(key="-IMAGE-", size=(40, 40))],
+    [sg.Text(size=(60, 1), key="-SPACE4-")],
+    [sg.Button('Send', border_width=0, font='Calibri 16', key='_BUTTON_SEND_'), sg.Button(
+        'Send to all', border_width=0, font='Calibri 16', key='_BUTTON_SEND_TO_ALL_')],
 ]
 
 layout = [
@@ -30,7 +36,12 @@ layout = [
 ]
 
 # Create the window
-window = sg.Window("Demo", layout, margins=(50, 100))
+window = sg.Window("Demo", layout, margins=(50, 100), default_element_size=(12, 1),
+                   text_justification='l',
+                   auto_size_text=False,
+                   auto_size_buttons=False,
+                   default_button_element_size=(12, 1),
+                   finalize=True)
 
 # Create an event loop
 while True:
@@ -39,7 +50,13 @@ while True:
     # presses the OK button
     if event == "_BUTTON_SEND_":
         msg = values["-MESSAGE-"]
-        print(msg)
+    if event == "-FILE_NAME-":
+        filename = values["-FILE_NAME-"]
+        if filename.endswith(('.png', '.gif')):
+            window['-UPLOAD_INFO-'].update("")
+            window["-IMAGE-"].update(filename=filename)
+        else:
+            window['-UPLOAD_INFO-'].update("Please select valid image")
     if event == "OK" or event == sg.WIN_CLOSED:
         break
 
