@@ -1,20 +1,10 @@
-# hello_psg.py
-
 import PySimpleGUI as sg
 from PIL import Image, ImageTk
-import io
 
 
-def get_img_data(f, maxsize=(200, 200), first=False):
-    """Generate image data using PIL
-    """
+def get_img_data(f, maxsize=(250, 250)):
     img = Image.open(f)
     img.thumbnail(maxsize)
-    if first:                     # tkinter is inactive the first time
-        bio = io.BytesIO()
-        img.save(bio, format="PNG")
-        del img
-        return bio.getvalue()
     return ImageTk.PhotoImage(img)
 
 
@@ -23,6 +13,7 @@ sg.theme('Dark Purple 7')
 clients = ['Gone last', "Yoboii", "Sharma ji", "Bandu", "Mote dai"]
 clients_column = [
     [sg.Text("Server", font='Courier 40')],
+    [sg.Text('HOSTNAME', font='Verdana 14', size=(40, 1))],
     [sg.Text(size=(40, 1), key="-SPACE1-")],
 ]
 for client in clients:
@@ -34,10 +25,11 @@ message_column = [
     [sg.Multiline(size=(60, 7), font='Times 13', border_width=0, background_color='#dedede', text_color='#131',
                   enable_events=True, key="-MESSAGE-")],
     [sg.Text(size=(60, 1), key="-SPACE3-")],
-    [sg.In(size=(30, 1), enable_events=True, font='Verdana 13', key="-FILE_NAME-"), sg.FileBrowse('Upload Image',
-                                                                                                  font='Calibri 16', key='_BUTTON_UPLOAD_')],
+    [sg.In(size=(30, 1), enable_events=True, font='Verdana 11', key="-FILE_NAME-"), sg.FileBrowse('Browse',
+                                                                                                  font='Calibri 14', key='_BUTTON_UPLOAD_')],
     [sg.Text(size=(60, 1), key="-UPLOAD_INFO-")],
     [sg.Image(key="-IMAGE-")],
+    [sg.Button('Upload', border_width=0, font='Calibri 16', key='_BUTTON_SEND_')],
     [sg.Text(size=(60, 1), key="-SPACE4-")],
     [sg.Button('Send', border_width=0, font='Calibri 16', key='_BUTTON_SEND_'), sg.Button(
         'Send to all', border_width=0, font='Calibri 16', key='_BUTTON_SEND_TO_ALL_')],
@@ -70,7 +62,7 @@ while True:
         filename = values["-FILE_NAME-"]
         if filename.endswith(('.png', '.gif', '.jpg', 'jpeg')):
             window['-UPLOAD_INFO-'].update("")
-            window["-IMAGE-"].update(data=get_img_data(filename, first=True))
+            window["-IMAGE-"].update(data=get_img_data(filename))
         else:
             window['-UPLOAD_INFO-'].update("Please select valid image")
     if event == "OK" or event == sg.WIN_CLOSED:
